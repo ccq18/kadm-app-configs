@@ -6,4 +6,4 @@ resources:
 images:
 - name: ghcr.io/ccq18/demo-hello-spring
   newName: ghcr.io/ccq18/demo-hello-spring
-  newTag: sha-68b04c5
+  newTag: sha-f7775a0
