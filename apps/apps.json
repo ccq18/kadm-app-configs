@@ -46,5 +46,29 @@
       "namespace": "apps",
       "name": "hellospring"
     }
+  },
+  {
+    "id": "demo-hello-copy",
+    "name": "Demo Hello Copy",
+    "github": {
+      "owner": "ccq18",
+      "repo": "demo-hello",
+      "workflow": "build-and-publish.yaml",
+      "ref": "main"
+    },
+    "gitops": {
+      "owner": "ccq18",
+      "repo": "kadm-app-configs",
+      "path": "apps/demo-hello-copy/overlays/prod",
+      "image": "ghcr.io/ccq18/demo-hello",
+      "ref": "main"
+    },
+    "argocd": {
+      "application": "demo-hello-copy"
+    },
+    "rollout": {
+      "namespace": "apps",
+      "name": "hello-copy"
+    }
   }
 ]

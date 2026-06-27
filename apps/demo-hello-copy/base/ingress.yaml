@@ -1,0 +1,18 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: hello-copy
+  namespace: apps
+spec:
+  ingressClassName: traefik
+  rules:
+    - host: hello-copy.ai47.cc
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: hello-copy
+                port:
+                  number: 80
