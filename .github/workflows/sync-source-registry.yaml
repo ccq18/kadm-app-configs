@@ -1,0 +1,69 @@
+name: Sync KADM Source Registry
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - apps/**
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Skip when sync secrets are not configured
+        id: guard
+        env:
+          KADM_SYNC_HOST: ${{ secrets.KADM_SYNC_HOST }}
+          KADM_SYNC_USER: ${{ secrets.KADM_SYNC_USER }}
+          KADM_SYNC_SSH_KEY: ${{ secrets.KADM_SYNC_SSH_KEY }}
+        run: |
+          if [ -z "${KADM_SYNC_HOST}" ] || [ -z "${KADM_SYNC_USER}" ] || [ -z "${KADM_SYNC_SSH_KEY}" ]; then
+            echo "configured=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          echo "configured=true" >> "$GITHUB_OUTPUT"
+
+      - name: Install SSH key
+        if: steps.guard.outputs.configured == 'true'
+        env:
+          KADM_SYNC_HOST: ${{ secrets.KADM_SYNC_HOST }}
+          KADM_SYNC_SSH_KEY: ${{ secrets.KADM_SYNC_SSH_KEY }}
+        run: |
+          mkdir -p "$HOME/.ssh"
+          chmod 700 "$HOME/.ssh"
+          printf '%s\n' "${KADM_SYNC_SSH_KEY}" > "$HOME/.ssh/id_ed25519"
+          chmod 600 "$HOME/.ssh/id_ed25519"
+          ssh-keyscan -H "${KADM_SYNC_HOST}" >> "$HOME/.ssh/known_hosts"
+
+      - name: Push source registry cache into cluster
+        if: steps.guard.outputs.configured == 'true'
+        env:
+          KADM_SYNC_HOST: ${{ secrets.KADM_SYNC_HOST }}
+          KADM_SYNC_USER: ${{ secrets.KADM_SYNC_USER }}
+          KADM_SYNC_KUBECTL_CMD: ${{ secrets.KADM_SYNC_KUBECTL_CMD }}
+          GITHUB_SHA: ${{ github.sha }}
+        run: |
+          : "${KADM_SYNC_KUBECTL_CMD:=k3s kubectl}"
+          scp apps/apps.json "${KADM_SYNC_USER}@${KADM_SYNC_HOST}:/tmp/kadm-source-apps.json"
+          ssh "${KADM_SYNC_USER}@${KADM_SYNC_HOST}" \
+            "export KADM_SYNC_KUBECTL_CMD='${KADM_SYNC_KUBECTL_CMD}'; export KADM_SOURCE_REVISION='${GITHUB_SHA}'; bash -s" <<'REMOTE'
+          set -euo pipefail
+          cat > /tmp/kadm-source-apps-config.yaml <<EOF
+          apiVersion: v1
+          kind: ConfigMap
+          metadata:
+            name: kadm-source-apps-config
+            namespace: kadm
+            annotations:
+              kadm.ai/source-revision: ${KADM_SOURCE_REVISION}
+          data:
+            apps.json: |
+          $(sed 's/^/      /' /tmp/kadm-source-apps.json)
+          EOF
+          ${KADM_SYNC_KUBECTL_CMD} apply -f /tmp/kadm-source-apps-config.yaml
+          rm -f /tmp/kadm-source-apps.json /tmp/kadm-source-apps-config.yaml
+REMOTE
