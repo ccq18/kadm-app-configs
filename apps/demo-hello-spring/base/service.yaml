@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: hellospring
+  namespace: apps
+  labels:
+    app.kubernetes.io/name: hellospring
+spec:
+  type: ClusterIP
+  selector:
+    app.kubernetes.io/name: hellospring
+  ports:
+    - name: http
+      port: 80
+      targetPort: http
