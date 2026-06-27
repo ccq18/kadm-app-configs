@@ -6,4 +6,4 @@ resources:
 images:
 - name: ghcr.io/ccq18/demo-hello
   newName: ghcr.io/ccq18/demo-hello
-  newTag: repro-auto-promote-1
+  newTag: sha-3dafe76
