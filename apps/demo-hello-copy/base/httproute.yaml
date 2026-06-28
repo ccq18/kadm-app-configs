@@ -7,6 +7,8 @@ spec:
   parentRefs:
     - name: apps-gateway
       sectionName: http
+    - name: apps-gateway
+      sectionName: https
   hostnames:
     - hello-copy.ai47.cc
   rules:
