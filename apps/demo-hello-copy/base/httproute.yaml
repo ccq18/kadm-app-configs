@@ -1,0 +1,19 @@
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: hello-copy
+  namespace: apps
+spec:
+  parentRefs:
+    - name: apps-gateway
+      sectionName: http
+  hostnames:
+    - hello-copy.ai47.cc
+  rules:
+    - matches:
+        - path:
+            type: PathPrefix
+            value: /
+      backendRefs:
+        - name: hello-copy
+          port: 80

@@ -4,4 +4,4 @@ resources:
   - rollout.yaml
   - service.yaml
   - service-preview.yaml
-  - ingress.yaml
+  - httproute.yaml
