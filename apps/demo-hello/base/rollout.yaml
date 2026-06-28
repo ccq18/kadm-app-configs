@@ -13,15 +13,10 @@ spec:
     matchLabels:
       app.kubernetes.io/name: hello
   strategy:
-    canary:
-      maxSurge: 1
-      maxUnavailable: 0
-      steps:
-        - setWeight: 33
-        - pause: {}
-        - setWeight: 66
-        - pause: {}
-        - setWeight: 100
+    blueGreen:
+      activeService: hello
+      previewService: hello-preview
+      autoPromotionEnabled: false
   template:
     metadata:
       labels:
