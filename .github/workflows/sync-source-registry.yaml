@@ -6,6 +6,7 @@ on:
       - main
     paths:
       - apps/**
+      - .github/workflows/sync-source-registry.yaml
 
 jobs:
   sync:
@@ -66,4 +67,4 @@ jobs:
           EOF
           ${KADM_SYNC_KUBECTL_CMD} apply -f /tmp/kadm-source-apps-config.yaml
           rm -f /tmp/kadm-source-apps.json /tmp/kadm-source-apps-config.yaml
-REMOTE
+          REMOTE
