@@ -6,4 +6,4 @@ resources:
 images:
 - name: ghcr.io/ccq18/demo-hello
   newName: ghcr.io/ccq18/demo-hello
-  newTag: bgtest-20260628-1
+  newTag: sha-5ac52bc

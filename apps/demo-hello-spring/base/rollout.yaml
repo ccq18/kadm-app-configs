@@ -46,6 +46,8 @@ spec:
               value: "10.120.0.6"
             - name: DB_PORT
               value: "3306"
+            - name: DB_SSL_MODE
+              value: "VERIFY_IDENTITY"
             - name: DB_USER
               valueFrom:
                 secretKeyRef:
